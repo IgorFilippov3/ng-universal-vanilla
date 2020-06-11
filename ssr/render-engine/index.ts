@@ -1,5 +1,5 @@
-import {ɵCommonEngine as CommonEngine, ɵRenderOptions as RenderOptions} from "@nguniversal/common/engine";
-import * as fs from "fs";
+import { ɵCommonEngine as CommonEngine, ɵRenderOptions as RenderOptions } from "@nguniversal/common/engine";
+import { readFileSync } from "fs";
 
 const templateCache = {};
 
@@ -11,11 +11,11 @@ export function renderEngine() {
       if (templateCache[filepath]) {
         renderOptions.document = templateCache[filepath];
       } else {
-        renderOptions.document = fs.readFileSync(filepath).toString();
+        renderOptions.document = readFileSync(filepath).toString();
       }
 
       return await engine.render(renderOptions);
-      
+
     } catch (err) {
       throw new Error(err);
     }

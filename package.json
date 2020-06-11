@@ -26,6 +26,7 @@
     "@angular/platform-server": "~9.1.0",
     "@angular/router": "~9.1.0",
     "@nguniversal/express-engine": "^9.1.1",
+    "cookie": "^0.4.1",
     "express": "^4.15.2",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
