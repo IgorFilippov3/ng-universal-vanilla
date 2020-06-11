@@ -1,0 +1,67 @@
+##Introduction
+
+Hello! Last time we was talking about 
+[Angular Universal boilerplate setup](https://dev.to/igorfilippov3/angular-universal-boilerplate-setup-239e). 
+And today, we will also talk about angular universal tuning, but without already baked libraries like express and ngExpressEngine.
+Only vanilla Node.js, only hardcore.
+
+##Let's go!
+
+I assume that your already have **@angular/cli** installed.
+
+We will start from scratch. First create new project:
+
+```
+ng new ng-universal-vanilla
+cd ng-universal-vanilla
+```
+
+Then run the following CLI command
+
+```
+ng add @nguniversal/express-engine
+```
+
+Actually, we do not need express web-server. But we need a plenty of another files produced by this command.
+
+First of all, take a look at *server.ts* file. At the line 18, you can find **ngExpressEngine**.
+This is a heart of angular server side rendering.
+It is express-based template engine, which use angular universal
+[CommonEngine](https://github.com/angular/universal/blob/master/modules/common/engine/src/engine.ts) under the hood.
+And **CommonEngine** it is exactly, what we need.
+
+Create *render-engine* folder in the root directory, with file *index.ts* in it. 
+```javascript
+import {ɵCommonEngine as CommonEngine, ɵRenderOptions as RenderOptions} from "@nguniversal/common/engine";
+import * as fs from "fs";
+
+const templateCache = {};
+
+export function renderEngine() {
+  const engine: CommonEngine = new CommonEngine();
+
+  return async function (filepath: string, renderOptions: RenderOptions) {
+    try {
+      if (templateCache[filepath]) {
+        renderOptions.document = templateCache[filepath];
+      } else {
+        renderOptions.document = fs.readFileSync(filepath).toString();
+      }
+
+      return await engine.render(renderOptions);
+      
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+}
+```
+
+A renderEngine function creates an instance of CommonEngine 
+and returns another function which uses this engine to run angular bundle in server/main.js 
+and produce an html template to send to the browser.
+In addition, we use a **templateCache** to store the *index.html* source code for better performance.
+And for the ability to not run the synchronous readFile function at any time when the server receives a request from the browser.
+
+Now, go to the *server.ts* file and remove everything from it. Than add following lines:
+
