@@ -12,6 +12,7 @@ export function renderEngine() {
         renderOptions.document = templateCache[filepath];
       } else {
         renderOptions.document = readFileSync(filepath).toString();
+        templateCache[filepath] = renderOptions.document;
       }
 
       return await engine.render(renderOptions);
